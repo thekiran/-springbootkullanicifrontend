@@ -8,16 +8,17 @@ import { DeleteDialog } from "@/components/delete-dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Plus, Search, RefreshCw } from "lucide-react"
-import { teacherApi, type Teacher } from "@/lib/api"
+import { teacherApi } from "@/lib/api"
+import type { Teacher } from "@/lib/types"
 
 const columns = [
   { key: "id" as const, label: "ID" },
-  { key: "first_name" as const, label: "Ad" },
-  { key: "last_name" as const, label: "Soyad" },
+  { key: "firstName" as const, label: "Ad" },
+  { key: "lastName" as const, label: "Soyad" },
   { key: "email" as const, label: "E-posta" },
-  { key: "phone_number" as const, label: "Telefon" },
-  { key: "tc_no" as const, label: "TC No" },
-  { key: "teacher_class" as const, label: "Sınıf" },
+  { key: "phoneNumber" as const, label: "Telefon" },
+  { key: "tcNo" as const, label: "TC No" },
+  { key: "teacherClass" as const, label: "Sınıf" },
 ]
 
 export default function TeachersPage() {
@@ -69,8 +70,8 @@ export default function TeachersPage() {
 
   const filteredTeachers = teachers.filter(
     (t) =>
-      t.first_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      t.last_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      t.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      t.lastName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       t.email?.toLowerCase().includes(searchQuery.toLowerCase()),
   )
 
@@ -142,7 +143,7 @@ export default function TeachersPage() {
           onOpenChange={setDeleteOpen}
           onConfirm={handleDelete}
           title="Öğretmeni Sil"
-          description={`${selectedTeacher?.first_name} ${selectedTeacher?.last_name} isimli öğretmeni silmek istediğinize emin misiniz? Bu işlem geri alınamaz.`}
+          description={`${selectedTeacher?.firstName ?? ""} ${selectedTeacher?.lastName ?? ""} isimli öğretmeni silmek istediğinize emin misiniz? Bu işlem geri alınamaz.`}
         />
       </main>
     </div>

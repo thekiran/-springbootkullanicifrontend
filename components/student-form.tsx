@@ -7,23 +7,26 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import type { Student } from "@/lib/api"
+import type { Student } from "@/lib/types"
 
 interface StudentFormProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
   student?: Student | null
   onSubmit: (data: Omit<Student, "id">) => Promise<void>
+  asPage?: boolean
 }
 
-export function StudentForm({ open, onOpenChange, student, onSubmit }: StudentFormProps) {
-  const [formData, setFormData] = useState({
+export function StudentForm({ open = false, onOpenChange, student, onSubmit, asPage = false }: StudentFormProps) {
+  const [formData, setFormData] = useState<Omit<Student, "id">>({
     email: "",
-    first_name: "",
-    last_name: "",
-    phone_number: "",
-    tc_no: "",
-    student_class: "",
+    firstName: "",
+    lastName: "",
+    phoneNumber: "",
+    tcNo: "",
+    studentClass: "",
+    maskedPhoneNumber: "",
+    maskedTcNo: "",
   })
   const [isLoading, setIsLoading] = useState(false)
 
@@ -31,20 +34,24 @@ export function StudentForm({ open, onOpenChange, student, onSubmit }: StudentFo
     if (student) {
       setFormData({
         email: student.email,
-        first_name: student.first_name,
-        last_name: student.last_name,
-        phone_number: student.phone_number,
-        tc_no: student.tc_no,
-        student_class: student.student_class,
+        firstName: student.firstName,
+        lastName: student.lastName,
+        phoneNumber: student.phoneNumber,
+        tcNo: student.tcNo,
+        studentClass: student.studentClass,
+        maskedPhoneNumber: student.maskedPhoneNumber ?? "",
+        maskedTcNo: student.maskedTcNo ?? "",
       })
     } else {
       setFormData({
         email: "",
-        first_name: "",
-        last_name: "",
-        phone_number: "",
-        tc_no: "",
-        student_class: "",
+        firstName: "",
+        lastName: "",
+        phoneNumber: "",
+        tcNo: "",
+        studentClass: "",
+        maskedPhoneNumber: "",
+        maskedTcNo: "",
       })
     }
   }, [student, open])
@@ -54,10 +61,111 @@ export function StudentForm({ open, onOpenChange, student, onSubmit }: StudentFo
     setIsLoading(true)
     try {
       await onSubmit(formData)
-      onOpenChange(false)
+      onOpenChange?.(false)
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const form = (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="firstName" className="text-muted-foreground">
+            Ad
+          </Label>
+          <Input
+            id="firstName"
+            value={formData.firstName}
+            onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+            className="bg-input border-border text-foreground"
+            required
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="lastName" className="text-muted-foreground">
+            Soyad
+          </Label>
+          <Input
+            id="lastName"
+            value={formData.lastName}
+            onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+            className="bg-input border-border text-foreground"
+            required
+          />
+        </div>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="email" className="text-muted-foreground">
+          E-posta
+        </Label>
+        <Input
+          id="email"
+          type="email"
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          className="bg-input border-border text-foreground"
+          required
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="phoneNumber" className="text-muted-foreground">
+          Telefon
+        </Label>
+        <Input
+          id="phoneNumber"
+          value={formData.phoneNumber}
+          onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+          className="bg-input border-border text-foreground"
+          required
+        />
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="tcNo" className="text-muted-foreground">
+            TC No
+          </Label>
+          <Input
+            id="tcNo"
+            value={formData.tcNo}
+            onChange={(e) => setFormData({ ...formData, tcNo: e.target.value })}
+            className="bg-input border-border text-foreground"
+            required
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="studentClass" className="text-muted-foreground">
+            Sınıf
+          </Label>
+          <Input
+            id="studentClass"
+            value={formData.studentClass}
+            onChange={(e) => setFormData({ ...formData, studentClass: e.target.value })}
+            className="bg-input border-border text-foreground"
+            required
+          />
+        </div>
+      </div>
+      <div className="flex justify-end gap-3 pt-4">
+        {!asPage && (
+          <Button type="button" variant="outline" onClick={() => onOpenChange?.(false)}>
+            İptal
+          </Button>
+        )}
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? "Kaydediliyor..." : student ? "Güncelle" : "Ekle"}
+        </Button>
+      </div>
+    </form>
+  )
+
+  if (asPage) {
+    return (
+      <div className="max-w-2xl rounded-lg border border-border bg-card p-6">
+        <h2 className="mb-4 text-xl font-semibold text-foreground">{student ? "Öğrenci Düzenle" : "Öğrenci Ekle"}</h2>
+        {form}
+      </div>
+    )
   }
 
   return (
@@ -66,93 +174,7 @@ export function StudentForm({ open, onOpenChange, student, onSubmit }: StudentFo
         <DialogHeader>
           <DialogTitle className="text-foreground">{student ? "Öğrenci Düzenle" : "Yeni Öğrenci Ekle"}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="first_name" className="text-muted-foreground">
-                Ad
-              </Label>
-              <Input
-                id="first_name"
-                value={formData.first_name}
-                onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                className="bg-input border-border text-foreground"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="last_name" className="text-muted-foreground">
-                Soyad
-              </Label>
-              <Input
-                id="last_name"
-                value={formData.last_name}
-                onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                className="bg-input border-border text-foreground"
-                required
-              />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-muted-foreground">
-              E-posta
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="bg-input border-border text-foreground"
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="phone_number" className="text-muted-foreground">
-              Telefon
-            </Label>
-            <Input
-              id="phone_number"
-              value={formData.phone_number}
-              onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
-              className="bg-input border-border text-foreground"
-              required
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="tc_no" className="text-muted-foreground">
-                TC No
-              </Label>
-              <Input
-                id="tc_no"
-                value={formData.tc_no}
-                onChange={(e) => setFormData({ ...formData, tc_no: e.target.value })}
-                className="bg-input border-border text-foreground"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="student_class" className="text-muted-foreground">
-                Sınıf
-              </Label>
-              <Input
-                id="student_class"
-                value={formData.student_class}
-                onChange={(e) => setFormData({ ...formData, student_class: e.target.value })}
-                className="bg-input border-border text-foreground"
-                required
-              />
-            </div>
-          </div>
-          <div className="flex justify-end gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              İptal
-            </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Kaydediliyor..." : student ? "Güncelle" : "Ekle"}
-            </Button>
-          </div>
-        </form>
+        {form}
       </DialogContent>
     </Dialog>
   )

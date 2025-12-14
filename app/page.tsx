@@ -1,5 +1,6 @@
 import { Sidebar } from "@/components/sidebar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { DashboardStats } from "@/components/dashboard-stats"
 import { GraduationCap, Users, BookOpen, TrendingUp } from "lucide-react"
 import Link from "next/link"
 
@@ -9,55 +10,11 @@ export default function HomePage() {
       <Sidebar />
       <main className="ml-64 min-h-screen p-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground">Hoş Geldiniz</h1>
+          <h1 className="text-3xl font-bold text-foreground">Hoş geldiniz</h1>
           <p className="mt-2 text-muted-foreground">Okul yönetim sistemine hoş geldiniz</p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="bg-card border-border">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Toplam Öğrenci</CardTitle>
-              <GraduationCap className="h-5 w-5 text-primary" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-foreground">-</div>
-              <p className="text-xs text-muted-foreground">Veritabanından yükleniyor</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card border-border">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Toplam Öğretmen</CardTitle>
-              <Users className="h-5 w-5 text-primary" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-foreground">-</div>
-              <p className="text-xs text-muted-foreground">Veritabanından yükleniyor</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card border-border">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Aktif Sınıflar</CardTitle>
-              <BookOpen className="h-5 w-5 text-primary" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-foreground">-</div>
-              <p className="text-xs text-muted-foreground">Veritabanından yükleniyor</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card border-border">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Sistem Durumu</CardTitle>
-              <TrendingUp className="h-5 w-5 text-primary" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-primary">Aktif</div>
-              <p className="text-xs text-muted-foreground">localhost:1010</p>
-            </CardContent>
-          </Card>
-        </div>
+        <DashboardStats />
 
         <div className="mt-8 grid gap-6 md:grid-cols-2">
           <Link href="/students">

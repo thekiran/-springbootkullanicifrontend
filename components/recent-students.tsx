@@ -4,22 +4,22 @@ import useSWR from "swr"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { fetchStudents } from "@/lib/api"
+import { studentApi } from "@/lib/api"
 import type { Student } from "@/lib/types"
 
 export function RecentStudents() {
-  const { data: students } = useSWR<Student[]>("/students", fetchStudents)
+  const { data: students } = useSWR<Student[]>("/students", studentApi.getAll)
 
-  const recentStudents = students?.sort((a, b) => b.id - a.id).slice(0, 5)
+  const recentStudents = students?.slice().sort((a, b) => (b.id ?? 0) - (a.id ?? 0)).slice(0, 5)
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Recent Students</CardTitle>
+        <CardTitle>Son Eklenen Öğrenciler</CardTitle>
       </CardHeader>
       <CardContent>
         {!recentStudents?.length ? (
-          <p className="text-sm text-muted-foreground">No students yet.</p>
+          <p className="text-sm text-muted-foreground">Henüz öğrenci eklenmedi.</p>
         ) : (
           <div className="space-y-4">
             {recentStudents.map((student) => (
@@ -30,8 +30,8 @@ export function RecentStudents() {
               >
                 <Avatar>
                   <AvatarFallback className="bg-primary/10 text-primary">
-                    {student.firstName[0]}
-                    {student.lastName[0]}
+                    {student.firstName?.[0]}
+                    {student.lastName?.[0]}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 space-y-1">
@@ -41,7 +41,7 @@ export function RecentStudents() {
                   <p className="text-sm text-muted-foreground">{student.email}</p>
                 </div>
                 <span className="text-xs text-muted-foreground font-mono">
-                  {student.maskedPhoneNumber || "No phone"}
+                  {student.maskedPhoneNumber || student.phoneNumber || "Telefon yok"}
                 </span>
               </Link>
             ))}

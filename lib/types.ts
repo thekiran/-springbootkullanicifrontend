@@ -1,24 +1,21 @@
 export interface Student {
-  id: number
+  id?: number
   firstName: string
   lastName: string
   email: string
-  maskedPhoneNumber: string
-  maskedtcNo: string
-}
-
-export interface StudentCreateRequest {
-  firstName: string
-  lastName: string
-  email: string
-  telephone: string
+  phoneNumber: string
   tcNo: string
+  studentClass: string
+  maskedPhoneNumber?: string
+  maskedTcNo?: string
 }
 
-export interface StudentUpdateRequest {
+export interface Teacher {
+  id?: number
+  teacherClass: string
+  email: string
   firstName: string
   lastName: string
-  email: string
-  telephone: string
+  phoneNumber: string
   tcNo: string
 }

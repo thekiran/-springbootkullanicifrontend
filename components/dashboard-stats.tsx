@@ -2,42 +2,52 @@
 
 import useSWR from "swr"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { fetchStudents } from "@/lib/api"
-import type { Student } from "@/lib/types"
-import { Users, Phone, Mail, Award as IdCard } from "lucide-react"
+import { studentApi, teacherApi } from "@/lib/api"
+import type { Student, Teacher } from "@/lib/types"
+import { Users, Phone, Mail, Award as IdCard, BookOpen } from "lucide-react"
 
 export function DashboardStats() {
-  const { data: students } = useSWR<Student[]>("/students", fetchStudents)
+  const { data: students } = useSWR<Student[]>("/students", studentApi.getAll)
+  const { data: teachers } = useSWR<Teacher[]>("/teachers", teacherApi.getAll)
 
-  const totalStudents = students?.length || 0
-  const studentsWithPhone = students?.filter((s) => s.maskedPhoneNumber).length || 0
-  const studentsWithTc = students?.filter((s) => s.maskedtcNo).length || 0
-  const uniqueEmails = new Set(students?.map((s) => s.email)).size || 0
+  const totalStudents = students?.length ?? 0
+  const totalTeachers = teachers?.length ?? 0
+  const studentsWithPhone = students?.filter((s) => s.phoneNumber || s.maskedPhoneNumber).length ?? 0
+  const studentsWithTc = students?.filter((s) => s.tcNo || s.maskedTcNo).length ?? 0
+
+  const studentClasses = students?.map((s) => s.studentClass).filter(Boolean) ?? []
+  const teacherClasses = teachers?.map((t) => t.teacherClass).filter(Boolean) ?? []
+  const activeClasses = new Set([...studentClasses, ...teacherClasses]).size
+
+  const uniqueEmails = new Set([
+    ...(students?.map((s) => s.email) ?? []),
+    ...(teachers?.map((t) => t.email) ?? []),
+  ]).size
 
   const stats = [
     {
-      title: "Total Students",
+      title: "Toplam Öğrenci",
       value: totalStudents,
       icon: Users,
-      description: "Registered students",
+      description: "Kayıtlı öğrenci sayısı",
     },
     {
-      title: "With Phone",
-      value: studentsWithPhone,
-      icon: Phone,
-      description: "Students with phone number",
+      title: "Toplam Öğretmen",
+      value: totalTeachers,
+      icon: Users,
+      description: "Kayıtlı öğretmen sayısı",
     },
     {
-      title: "With TC No",
-      value: studentsWithTc,
-      icon: IdCard,
-      description: "Students with TC number",
+      title: "Aktif Sınıflar",
+      value: activeClasses,
+      icon: BookOpen,
+      description: "Öğrenci/öğretmen sınıfları",
     },
     {
-      title: "Unique Emails",
+      title: "Eşsiz E-posta",
       value: uniqueEmails,
       icon: Mail,
-      description: "Registered email addresses",
+      description: "Kayıtlı e-posta adresleri",
     },
   ]
 
