@@ -3,12 +3,12 @@
 import { useState, useEffect, useCallback } from "react"
 import { Sidebar } from "@/components/sidebar"
 import { DataTable } from "@/components/data-table"
-import { StudentForm } from "@/components/student-form"
+import { TeacherForm } from "@/components/teacher-form"
 import { DeleteDialog } from "@/components/delete-dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Plus, Search, RefreshCw } from "lucide-react"
-import { studentApi, type Student } from "@/lib/api"
+import { teacherApi, type Teacher } from "@/lib/api"
 
 const columns = [
   { key: "id" as const, label: "ID" },
@@ -17,24 +17,24 @@ const columns = [
   { key: "email" as const, label: "E-posta" },
   { key: "phone_number" as const, label: "Telefon" },
   { key: "tc_no" as const, label: "TC No" },
-  { key: "student_class" as const, label: "Sınıf" },
+  { key: "teacher_class" as const, label: "Sınıf" },
 ]
 
-export default function StudentsPage() {
-  const [students, setStudents] = useState<Student[]>([])
+export default function TeachersPage() {
+  const [teachers, setTeachers] = useState<Teacher[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [formOpen, setFormOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
-  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
+  const [selectedTeacher, setSelectedTeacher] = useState<Teacher | null>(null)
 
-  const fetchStudents = useCallback(async () => {
+  const fetchTeachers = useCallback(async () => {
     setIsLoading(true)
     setError(null)
     try {
-      const data = await studentApi.getAll()
-      setStudents(data)
+      const data = await teacherApi.getAll()
+      setTeachers(data)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Bir hata oluştu")
     } finally {
@@ -43,35 +43,35 @@ export default function StudentsPage() {
   }, [])
 
   useEffect(() => {
-    fetchStudents()
-  }, [fetchStudents])
+    fetchTeachers()
+  }, [fetchTeachers])
 
-  const handleCreate = async (data: Omit<Student, "id">) => {
-    await studentApi.create(data)
-    fetchStudents()
+  const handleCreate = async (data: Omit<Teacher, "id">) => {
+    await teacherApi.create(data)
+    fetchTeachers()
   }
 
-  const handleUpdate = async (data: Omit<Student, "id">) => {
-    if (selectedStudent?.id) {
-      await studentApi.update(selectedStudent.id, data)
-      fetchStudents()
+  const handleUpdate = async (data: Omit<Teacher, "id">) => {
+    if (selectedTeacher?.id) {
+      await teacherApi.update(selectedTeacher.id, data)
+      fetchTeachers()
     }
   }
 
   const handleDelete = async () => {
-    if (selectedStudent?.id) {
-      await studentApi.delete(selectedStudent.id)
+    if (selectedTeacher?.id) {
+      await teacherApi.delete(selectedTeacher.id)
       setDeleteOpen(false)
-      setSelectedStudent(null)
-      fetchStudents()
+      setSelectedTeacher(null)
+      fetchTeachers()
     }
   }
 
-  const filteredStudents = students.filter(
-    (s) =>
-      s.first_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.last_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.email?.toLowerCase().includes(searchQuery.toLowerCase()),
+  const filteredTeachers = teachers.filter(
+    (t) =>
+      t.first_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      t.last_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      t.email?.toLowerCase().includes(searchQuery.toLowerCase()),
   )
 
   return (
@@ -80,17 +80,17 @@ export default function StudentsPage() {
       <main className="ml-64 min-h-screen p-8">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Öğrenciler</h1>
-            <p className="mt-2 text-muted-foreground">Öğrenci listesini yönetin</p>
+            <h1 className="text-3xl font-bold text-foreground">Öğretmenler</h1>
+            <p className="mt-2 text-muted-foreground">Öğretmen listesini yönetin</p>
           </div>
           <Button
             onClick={() => {
-              setSelectedStudent(null)
+              setSelectedTeacher(null)
               setFormOpen(true)
             }}
           >
             <Plus className="mr-2 h-4 w-4" />
-            Yeni Öğrenci
+            Yeni Öğretmen
           </Button>
         </div>
 
@@ -98,13 +98,13 @@ export default function StudentsPage() {
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Öğrenci ara..."
+              placeholder="Öğretmen ara..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="bg-input border-border pl-10 text-foreground"
             />
           </div>
-          <Button variant="outline" onClick={fetchStudents}>
+          <Button variant="outline" onClick={fetchTeachers}>
             <RefreshCw className="mr-2 h-4 w-4" />
             Yenile
           </Button>
@@ -117,32 +117,32 @@ export default function StudentsPage() {
         )}
 
         <DataTable
-          data={filteredStudents}
+          data={filteredTeachers}
           columns={columns}
           isLoading={isLoading}
-          onEdit={(student) => {
-            setSelectedStudent(student)
+          onEdit={(teacher) => {
+            setSelectedTeacher(teacher)
             setFormOpen(true)
           }}
-          onDelete={(student) => {
-            setSelectedStudent(student)
+          onDelete={(teacher) => {
+            setSelectedTeacher(teacher)
             setDeleteOpen(true)
           }}
         />
 
-        <StudentForm
+        <TeacherForm
           open={formOpen}
           onOpenChange={setFormOpen}
-          student={selectedStudent}
-          onSubmit={selectedStudent ? handleUpdate : handleCreate}
+          teacher={selectedTeacher}
+          onSubmit={selectedTeacher ? handleUpdate : handleCreate}
         />
 
         <DeleteDialog
           open={deleteOpen}
           onOpenChange={setDeleteOpen}
           onConfirm={handleDelete}
-          title="Öğrenciyi Sil"
-          description={`${selectedStudent?.first_name} ${selectedStudent?.last_name} isimli öğrenciyi silmek istediğinize emin misiniz? Bu işlem geri alınamaz.`}
+          title="Öğretmeni Sil"
+          description={`${selectedTeacher?.first_name} ${selectedTeacher?.last_name} isimli öğretmeni silmek istediğinize emin misiniz? Bu işlem geri alınamaz.`}
         />
       </main>
     </div>

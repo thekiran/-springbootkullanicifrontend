@@ -7,47 +7,47 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import type { Student } from "@/lib/api"
+import type { Teacher } from "@/lib/api"
 
-interface StudentFormProps {
+interface TeacherFormProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  student?: Student | null
-  onSubmit: (data: Omit<Student, "id">) => Promise<void>
+  teacher?: Teacher | null
+  onSubmit: (data: Omit<Teacher, "id">) => Promise<void>
 }
 
-export function StudentForm({ open, onOpenChange, student, onSubmit }: StudentFormProps) {
+export function TeacherForm({ open, onOpenChange, teacher, onSubmit }: TeacherFormProps) {
   const [formData, setFormData] = useState({
+    teacher_class: "",
     email: "",
     first_name: "",
     last_name: "",
     phone_number: "",
     tc_no: "",
-    student_class: "",
   })
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    if (student) {
+    if (teacher) {
       setFormData({
-        email: student.email,
-        first_name: student.first_name,
-        last_name: student.last_name,
-        phone_number: student.phone_number,
-        tc_no: student.tc_no,
-        student_class: student.student_class,
+        teacher_class: teacher.teacher_class,
+        email: teacher.email,
+        first_name: teacher.first_name,
+        last_name: teacher.last_name,
+        phone_number: teacher.phone_number,
+        tc_no: teacher.tc_no,
       })
     } else {
       setFormData({
+        teacher_class: "",
         email: "",
         first_name: "",
         last_name: "",
         phone_number: "",
         tc_no: "",
-        student_class: "",
       })
     }
-  }, [student, open])
+  }, [teacher, open])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -64,7 +64,7 @@ export function StudentForm({ open, onOpenChange, student, onSubmit }: StudentFo
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-card border-border sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-foreground">{student ? "Öğrenci Düzenle" : "Yeni Öğrenci Ekle"}</DialogTitle>
+          <DialogTitle className="text-foreground">{teacher ? "Öğretmen Düzenle" : "Yeni Öğretmen Ekle"}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -132,13 +132,13 @@ export function StudentForm({ open, onOpenChange, student, onSubmit }: StudentFo
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="student_class" className="text-muted-foreground">
+              <Label htmlFor="teacher_class" className="text-muted-foreground">
                 Sınıf
               </Label>
               <Input
-                id="student_class"
-                value={formData.student_class}
-                onChange={(e) => setFormData({ ...formData, student_class: e.target.value })}
+                id="teacher_class"
+                value={formData.teacher_class}
+                onChange={(e) => setFormData({ ...formData, teacher_class: e.target.value })}
                 className="bg-input border-border text-foreground"
                 required
               />
@@ -149,7 +149,7 @@ export function StudentForm({ open, onOpenChange, student, onSubmit }: StudentFo
               İptal
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Kaydediliyor..." : student ? "Güncelle" : "Ekle"}
+              {isLoading ? "Kaydediliyor..." : teacher ? "Güncelle" : "Ekle"}
             </Button>
           </div>
         </form>

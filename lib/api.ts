@@ -1,80 +1,105 @@
-import type { Student, StudentCreateRequest, StudentUpdateRequest } from "./types"
+const API_BASE_URL = "http://localhost:1010"
 
-// Use Next.js rewrite proxy to avoid CORS during local dev
-const API_BASE_URL = "/api/students"
-
-async function parseJsonSafely<T>(response: Response, { allowEmpty = false } = {}): Promise<T | null> {
-  const text = await response.text()
-  if (!text) {
-    if (allowEmpty) return null
-    throw new Error("Empty response from server")
-  }
-  try {
-    return JSON.parse(text) as T
-  } catch (err) {
-    throw new Error("Server returned invalid JSON")
-  }
+export interface Student {
+  id?: number
+  email: string
+  first_name: string
+  last_name: string
+  phone_number: string
+  tc_no: string
+  student_class: string
 }
 
-export async function fetchStudents(): Promise<Student[]> {
-  const response = await fetch(API_BASE_URL)
-  if (!response.ok) {
-    throw new Error("Failed to fetch students")
-  }
-  const data = await parseJsonSafely<Student[]>(response)
-  if (!data) {
-    throw new Error("Received empty student list")
-  }
-  return data
+export interface Teacher {
+  id?: number
+  teacher_class: string
+  email: string
+  first_name: string
+  last_name: string
+  phone_number: string
+  tc_no: string
 }
 
-export async function fetchStudent(id: number): Promise<Student> {
-  const response = await fetch(`${API_BASE_URL}/${id}`)
-  if (!response.ok) {
-    throw new Error("Failed to fetch student")
-  }
-  const data = await parseJsonSafely<Student>(response)
-  if (!data) {
-    throw new Error("Student not found")
-  }
-  return data
+// Student API
+export const studentApi = {
+  getAll: async (): Promise<Student[]> => {
+    const res = await fetch(`${API_BASE_URL}/students`)
+    if (!res.ok) throw new Error("Öğrenciler yüklenemedi")
+    return res.json()
+  },
+
+  getById: async (id: number): Promise<Student> => {
+    const res = await fetch(`${API_BASE_URL}/students/${id}`)
+    if (!res.ok) throw new Error("Öğrenci bulunamadı")
+    return res.json()
+  },
+
+  create: async (student: Omit<Student, "id">): Promise<Student> => {
+    const res = await fetch(`${API_BASE_URL}/students`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(student),
+    })
+    if (!res.ok) throw new Error("Öğrenci eklenemedi")
+    return res.json()
+  },
+
+  update: async (id: number, student: Partial<Student>): Promise<Student> => {
+    const res = await fetch(`${API_BASE_URL}/students/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(student),
+    })
+    if (!res.ok) throw new Error("Öğrenci güncellenemedi")
+    return res.json()
+  },
+
+  delete: async (id: number): Promise<void> => {
+    const res = await fetch(`${API_BASE_URL}/students/${id}`, {
+      method: "DELETE",
+    })
+    if (!res.ok) throw new Error("Öğrenci silinemedi")
+  },
 }
 
-export async function createStudent(data: StudentCreateRequest): Promise<Student | null> {
-  const response = await fetch(API_BASE_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  })
-  if (!response.ok) {
-    throw new Error("Failed to create student")
-  }
-  // Some backends may return 201 with empty body
-  return parseJsonSafely<Student>(response, { allowEmpty: true })
-}
+// Teacher API
+export const teacherApi = {
+  getAll: async (): Promise<Teacher[]> => {
+    const res = await fetch(`${API_BASE_URL}/teachers`)
+    if (!res.ok) throw new Error("Öğretmenler yüklenemedi")
+    return res.json()
+  },
 
-export async function updateStudent(id: number, data: StudentUpdateRequest): Promise<Student | null> {
-  const response = await fetch(`${API_BASE_URL}/${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  })
-  if (!response.ok) {
-    throw new Error("Failed to update student")
-  }
-  // Some backends may return 200/204 with empty body
-  return parseJsonSafely<Student>(response, { allowEmpty: true })
-}
+  getById: async (id: number): Promise<Teacher> => {
+    const res = await fetch(`${API_BASE_URL}/teachers/${id}`)
+    if (!res.ok) throw new Error("Öğretmen bulunamadı")
+    return res.json()
+  },
 
-export async function deleteStudent(id: number): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/${id}`, {
-    method: "DELETE",
-  })
-  if (!response.ok) {
-    throw new Error("Failed to delete student")
-  }
+  create: async (teacher: Omit<Teacher, "id">): Promise<Teacher> => {
+    const res = await fetch(`${API_BASE_URL}/teachers`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(teacher),
+    })
+    if (!res.ok) throw new Error("Öğretmen eklenemedi")
+    return res.json()
+  },
+
+  update: async (id: number, teacher: Partial<Teacher>): Promise<Teacher> => {
+    const res = await fetch(`${API_BASE_URL}/teachers/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(teacher),
+    })
+    if (!res.ok) throw new Error("Öğretmen güncellenemedi")
+    return res.json()
+  },
+
+  delete: async (id: number): Promise<void> => {
+    const res = await fetch(`${API_BASE_URL}/teachers/${id}`, {
+      method: "DELETE",
+    })
+    if (!res.ok) throw new Error("Öğretmen silinemedi")
+  },
 }
