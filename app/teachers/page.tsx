@@ -19,6 +19,7 @@ const columns = [
   { key: "phoneNumber" as const, label: "Telefon" },
   { key: "tcNo" as const, label: "TC No" },
   { key: "teacherClass" as const, label: "Sınıf" },
+  { key: "studentCount" as const, label: "Öğrenci Sayısı" },
 ]
 
 export default function TeachersPage() {

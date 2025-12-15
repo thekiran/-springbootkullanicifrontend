@@ -18,4 +18,5 @@ export interface Teacher {
   lastName: string
   phoneNumber: string
   tcNo: string
+  studentCount?: number
 }

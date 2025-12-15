@@ -9,11 +9,13 @@ type StudentApiModel = {
   first_name?: string
   last_name?: string
   phone_number?: string
+  telephone?: string
   tc_no?: string
   student_class?: string
   firstName?: string
   lastName?: string
   phoneNumber?: string
+  telephoneNumber?: string
   tcNo?: string
   studentClass?: string
   maskedPhoneNumber?: string
@@ -34,6 +36,8 @@ type TeacherApiModel = {
   phoneNumber?: string
   tcNo?: string
   teacherClass?: string
+  student_count?: number
+  studentCount?: number
 }
 
 const mapStudentFromApi = (data: StudentApiModel): Student => ({
@@ -41,8 +45,14 @@ const mapStudentFromApi = (data: StudentApiModel): Student => ({
   email: data.email,
   firstName: data.firstName ?? data.first_name ?? "",
   lastName: data.lastName ?? data.last_name ?? "",
-  phoneNumber: data.phoneNumber ?? data.phone_number ?? "",
-  tcNo: data.tcNo ?? data.tc_no ?? "",
+  phoneNumber:
+    data.phoneNumber ??
+    data.phone_number ??
+    data.telephone ??
+    data.telephoneNumber ??
+    data.maskedPhoneNumber ??
+    "",
+  tcNo: data.tcNo ?? data.tc_no ?? data.maskedTcNo ?? data.maskedtcNo ?? "",
   studentClass: data.studentClass ?? data.student_class ?? "",
   maskedPhoneNumber: data.maskedPhoneNumber ?? data.phone_number ?? data.phoneNumber ?? "",
   maskedTcNo: data.maskedTcNo ?? data.maskedtcNo ?? data.tc_no ?? data.tcNo ?? "",
@@ -51,11 +61,27 @@ const mapStudentFromApi = (data: StudentApiModel): Student => ({
 const mapStudentToApi = (data: Partial<Student>): Partial<StudentApiModel> => {
   const payload: Partial<StudentApiModel> = {}
   if (data.email !== undefined) payload.email = data.email
-  if (data.firstName !== undefined) payload.firstName = data.firstName
-  if (data.lastName !== undefined) payload.lastName = data.lastName
-  if (data.phoneNumber !== undefined) payload.phoneNumber = data.phoneNumber
-  if (data.tcNo !== undefined) payload.tcNo = data.tcNo
-  if (data.studentClass !== undefined) payload.studentClass = data.studentClass
+  if (data.firstName !== undefined) {
+    payload.firstName = data.firstName
+    payload.first_name = data.firstName
+  }
+  if (data.lastName !== undefined) {
+    payload.lastName = data.lastName
+    payload.last_name = data.lastName
+  }
+  if (data.phoneNumber !== undefined) {
+    payload.phoneNumber = data.phoneNumber
+    payload.phone_number = data.phoneNumber
+    payload.telephone = data.phoneNumber
+  }
+  if (data.tcNo !== undefined) {
+    payload.tcNo = data.tcNo
+    payload.tc_no = data.tcNo
+  }
+  if (data.studentClass !== undefined) {
+    payload.studentClass = data.studentClass
+    payload.student_class = data.studentClass
+  }
   return payload
 }
 
@@ -67,6 +93,7 @@ const mapTeacherFromApi = (data: TeacherApiModel): Teacher => ({
   phoneNumber: data.phoneNumber ?? data.phone_number ?? "",
   tcNo: data.tcNo ?? data.tc_no ?? "",
   teacherClass: data.teacherClass ?? data.teacher_class ?? "",
+  studentCount: data.studentCount ?? data.student_count ?? 0,
 })
 
 const mapTeacherToApi = (data: Partial<Teacher>): Partial<TeacherApiModel> => {
